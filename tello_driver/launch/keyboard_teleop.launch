@@ -1,0 +1,12 @@
+<launch>
+    <!-- arguments of the keyboard teleop node  -->
+    <arg name="speed" default="0.2" />
+    <arg name="repeat_rate" default="10.0" />
+    <arg name="key_timeout" default="0.0" />
+
+    <node name="tello_keyboard_teleop" pkg="tello_driver" type="keyboard_teleop_node.py" output="screen">
+        <param name="speed" value="$(arg speed)" /> 
+        <param name="repeat_rate" value="$(arg repeat_rate)" />
+        <param name="key_timeout" value="$(arg key_timeout)" />
+    </node>
+</launch>
