@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import math
 # import numpy as np
@@ -10,7 +10,7 @@ from sensor_msgs.msg import Imu, Range, BatteryState
 from hector_uav_msgs.srv import EnableMotors
 
 from tellolib.Tello_Video.tello import Tello
-from tellolib.Tello_Video.tello_control_ui import TelloUI
+from tellolib.Tello_Video.tello_control_ui import TelloUI 
 
 import time
 import threading
@@ -120,7 +120,7 @@ class TelloROSDriver(object):
 
                     time.sleep(0.004)
 
-        except RuntimeError, e:
+        except RuntimeError as e:
             rospy.loginfo('caught a RuntimeError for gettng IMU')
 
 
@@ -151,7 +151,7 @@ class TelloROSDriver(object):
                 self._img_pub.publish(imgMsg)
                 time.sleep(0.04)#todo cant find reason why quality less than tiker
 
-        except RuntimeError, e:
+        except RuntimeError as e:
             rospy.loginfo('caught a RuntimeError for gettng video')
 
     def _cmd_vel_sub_cb(self, msg):
