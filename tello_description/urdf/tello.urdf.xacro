@@ -1,38 +1,64 @@
 <?xml version="1.0"?>
 
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="quadrotor" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+  
+  <!-- <link name="world" />
 
-  <xacro:include filename="$(find hector_sensors_description)/urdf/sonar_sensor.urdf.xacro" />
-  <xacro:property name="pi" value="3.1415926535897931" />
+  <joint name="world_to_new_world_joint=" type="fixed">
+    <origin xyz="0 0 0" rpy="1.57 0.0 0.0" />
+    <parent link="world"/>
+    <child link="new_world"/>
+  </joint>
+
+  <link name="new_world" />
+  
+  <joint name="new_world_to_base_joint=" type="fixed">
+    <parent link="new_world"/>
+    <child link="base_link"/>
+  </joint> -->
 
   <!-- Main quadrotor link -->
   <xacro:macro name="quadrotor_base_macro">
     <link name="base_link">
       <inertial>
         <mass value="0.085" />
-        <origin xyz="0 0 0" />
+        <origin xyz="0 0 0" rpy="0 0 ${-M_PI/2}" />
         <inertia ixx="0.01152" ixy="0.0" ixz="0.0" iyy="0.01152" iyz="0.0" izz="0.0218" />
       </inertial>
 
       <visual>
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <origin xyz="0 0 0" rpy="0 0 ${-M_PI/2}" />
         <geometry>
-	  <mesh filename="package://tello_description/meshes/tello.dae"/>
+          <!--3d model of Ryze Tello drone provided by https://www.halfchrome.com/downloads/dji-tello-cad-model/-->
+	        <mesh filename="package://tello_description/meshes/tello.dae"/>
         </geometry>
       </visual>
 
       <collision>
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <origin xyz="0 0 0" rpy="0 0 ${-M_PI/2}" />
         <geometry>
-	  <mesh filename="package://tello_description/meshes/tello.stl"/>
-        </geometry>
+          <!--3d model of Ryze Tello drone provided by https://www.halfchrome.com/downloads/dji-tello-cad-model/-->
+	        <mesh filename="package://tello_description/meshes/tello.stl"/>
+        </geometry> 
       </collision>
     </link>
 
-    <!-- Sonar height sensor -->
-    <xacro:sonar_sensor name="sonar" parent="base_link" ros_topic="sonar_height" update_rate="10" min_range="0.03" max_range="3.0" field_of_view="${40*pi/180}" ray_count="3">
-      <origin xyz="-0.01 0.0 0.005" rpy="0 ${90*pi/180} 0"/>
+    <!-- Altitude sensor. Tello uses a pair of IR sensors instead, but we couldn't find any in hector_sensors package -->
+    <xacro:include filename="$(find tello_description)/urdf/sonar_sensor.urdf.xacro" />
+    <xacro:sonar_sensor name="sonar" parent="base_link" ros_topic="sonar_height" update_rate="10" min_range="0.03" max_range="3.0" field_of_view="${10*pi/180}" ray_count="1">
+      <origin xyz="-0.02 0.0 0.025" rpy="0 1.5707 0"/>
     </xacro:sonar_sensor>
 
+    <!--Front camera. With real Tello there is no way to access downward looking camera-->
+        <!-- Forward facing camera -->
+    <xacro:include filename="$(find tello_description)/urdf/generic_camera.urdf.xacro" />
+    <xacro:generic_camera name="front_cam" parent="base_link" ros_topic="camera/image" cam_info_topic="camera/camera_info" res_x="640" res_y="480" image_format="R8G8B8" update_rate="60" hfov="83">
+      <origin xyz="0.07 0.00 0.03" rpy="0 0 0"/>
+    </xacro:generic_camera>
+
   </xacro:macro>
+  <!--Base of the hector_quadrotor, which connects gazebo plugins and flight controller from the hector_quadrotor package-->
+  <xacro:quadrotor_base_macro />
 </robot>
